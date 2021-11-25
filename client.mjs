@@ -67,11 +67,11 @@ const runEmail = async(vehicles) => {
 
         for(let i = 1; i < items.length; i++){
             if(items[i]["speed"] == 0){
-                let duration = dateToMillis(items[i]["time"]) - dateToMillis(items[i-1]["time"])
+                let duration = dateToMillis(items[i]["gpstime"]) - dateToMillis(items[i-1]["gpstime"])
                 totalDuration += duration
                 drivingDuration += duration
             }else if(items[i]["speed"] > 0){
-                let duration = dateToMillis(items[i]["time"]) - dateToMillis(items[i-1]["time"])
+                let duration = dateToMillis(items[i]["gpstime"]) - dateToMillis(items[i-1]["gpstime"])
                 totalDuration += duration
                 idleDuration += duration
             }
@@ -124,7 +124,7 @@ const runEmail = async(vehicles) => {
                         return item
                     }else {
                         // Check next element duration
-                        let duration = dateToMillis(data["data"][index+1]["time"]) - dateToMillis(item.time)
+                        let duration = dateToMillis(data["data"][index+1]["gpstime"]) - dateToMillis(item.gpstime)
                         if(duration > threshold){
                             return item
                         } else {
@@ -260,9 +260,9 @@ const runEmail = async(vehicles) => {
                                         <tr style=${detail.speed >0 ? "font-weight:bold;background-color:whitesmoke;" : "color:grey;"}>
                                             <td>${detail.maxspeed} km/h</td>
                                             <td>${detail.location}</td>
-                                            <td>${detail.time}</td>
-                                            <td>${ item["data"][index+1]["time"] }</td>
-                                            <td>${((new Date(item["data"][index+1]["time"]) - new Date(detail["time"]) )/1000)}</td>
+                                            <td>${detail.gpstime}</td>
+                                            <td>${ item["data"][index+1]["gpstime"] }</td>
+                                            <td>${((new Date(item["data"][index+1]["gpstime"]) - new Date(detail["gpstime"]) )/1000)}</td>
                                             <td>${ (detail.speed === 0 )? `<p style="color:red">Idle</p>` : `<p style="color:green">Driving</p>` }</td>
                                         </tr>
                                     `)

@@ -2,8 +2,10 @@ import express from 'express'
 import fetch from 'node-fetch'
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import dotenv from 'dotenv'
 
-
+dotenv.config()
+const {GPS_API_URL, GOOGLE_API_KEY} = process.env
 const app = express()
 
 const port = 6200
@@ -11,22 +13,6 @@ const jsonParser = bodyParser.json()
 app.use(jsonParser)
 app.use(cors())
 
-// key = zT908g2j9nhExsAmW2pQahTvmGt8B2QZ9Gk5pIky7N4%3D
-
-// Get secret API key
-app.post('/getKey', async(req,res) => {
-    try {
-        var clientIp = requestIp.getClientIp(req);
-        console.log(clientIp);
-        const username = req.body.username;
-        const password = req.body.password;
-        let response = await fetch(`http://tnts-eye2a.dvrdns.org:12056/api/v1/basic/key?username=${username}&password=${password}`)
-        let data = await response.json()
-        res.json(data)
-    }catch(err){
-        res.json(err)
-    }
-})
 
 const dateToMillis = (date) => {
     let d = new Date(date)
@@ -47,7 +33,7 @@ app.post('/gps', async(req, res) => {
         const startdatetime = req.body.startdatetime // string
         const enddatetime = req.body.enddatetime
 
-        let response = await fetch('http://tnts-eye2a.dvrdns.org:12056/api/v1/basic/gps/detail', {
+        let response = await fetch(GPS_API_URL, {
             headers: {
                 'Content-type': 'application/json'
             },
@@ -72,20 +58,20 @@ app.post('/gps', async(req, res) => {
             }
             if(index == 0) {
                 // dateToMillis(item.time)
-                previousTime = dateToMillis(item.time)
+                previousTime = dateToMillis(item.gpstime)
                 previousSpeed =  parseInt(item.speed)
                 return item
-            }else if(previousSpeed !== 0 && item.speed == 0 && (dateToMillis(item.time) - previousTime >= threshold) ) {
+            }else if(previousSpeed !== 0 && item.speed == 0 && (dateToMillis(item.gpstime) - previousTime >= threshold) ) {
                 // await console.log(dateToMillis(item.time))
-                previousTime = dateToMillis(item.time)
+                previousTime = dateToMillis(item.gpstime)
                 previousSpeed =  parseInt(item.speed)
                 recordSpeed.push(maxSpeed)
                 maxSpeed = 0
                 item["maxSpeed"] = 0
                 return item
-            }else if(previousSpeed === 0 && item.speed !== 0 && (dateToMillis(item.time) - previousTime >= threshold)){
+            }else if(previousSpeed === 0 && item.speed !== 0 && (dateToMillis(item.gpstime) - previousTime >= threshold)){
                 // await console.log(dateToMillis(item.time))
-                previousTime = dateToMillis(item.time)
+                previousTime = dateToMillis(item.gpstime)
                 previousSpeed =  parseInt(item.speed)
                 return item
             }
@@ -112,7 +98,7 @@ app.post('/gps', async(req, res) => {
         let finalData = await Promise.all(processedData.map(async (item,index) => {
                 try {
 
-                    let locationName = await callAPI(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${parseFloat(item.gpslat)},${parseFloat(item.gpslng)}&key=AIzaSyDr5VKsAqZqgN8zfppjow65NxlgfiB8pds`)
+                    let locationName = await callAPI(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${parseFloat(item.gpslat)},${parseFloat(item.gpslng)}&key=${GOOGLE_API_KEY}`)
                     sleep(30000)
                     item["location"] = locationName
                     return item
