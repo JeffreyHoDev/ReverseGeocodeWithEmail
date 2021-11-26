@@ -1,6 +1,7 @@
 import fetch from 'node-fetch'
 import nodemailer from 'nodemailer'
 import dotenv from 'dotenv'
+import cron from 'node-cron'
 
 dotenv.config()
 const {API_KEY, EMAIL_PW, SENDER_EMAIL} = process.env
@@ -108,11 +109,11 @@ const runEmail = async(vehicles) => {
         return vehicle
     })
     )
-
     
     // Filter for stop duration only 1 minute
-    total_data.map((data, index) => {
+    total_data.map(data => {
         let needRemovedIndex = 0
+        
         let filteredData = data["data"].filter((item, index) => {
             if(index === 0){
                 return item
@@ -295,4 +296,6 @@ const runEmail = async(vehicles) => {
     
 }
 
-runEmail(vehicleList)
+// cron.schedule('52 11 * * *', function() {
+    runEmail(vehicleList)
+// });

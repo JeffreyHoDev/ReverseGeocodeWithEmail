@@ -78,7 +78,7 @@ app.post('/gps', async(req, res) => {
 
             
         })
-        console.log(recordSpeed)
+        
 
         let callAPI = async(url) => {
             let location = null
