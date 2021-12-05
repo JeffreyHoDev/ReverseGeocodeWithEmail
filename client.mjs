@@ -33,12 +33,21 @@ let vehicleList = [
         "serial": "003F0008E2"
     },
 ]
+    // Convert date to milliseconds
+    const dateToMillis = (date) => {
+        let d = new Date(date)
+        return d.getTime()
+    }
 
 const runEmail = async(vehicles) => {
+
     let date = new Date();
-    let todayDate = date.toISOString().slice(0, 10)
-    date.setDate(date.getDate() - 1);
-    let yesterdayDate = date.toISOString().slice(0, 10)
+    let todayMillis = dateToMillis(date)
+    todayMillis = todayMillis + (8*60*60*1000)
+    let todayDate = new Date(todayMillis)
+    // let todayDate = date.toISOString().slice(0, 10)
+    todayDate.setDate(todayDate.getDate() - 1);
+    let yesterdayDate = todayDate.toISOString().slice(0, 10)
     let threshold = 2 * 60 * 1000 // Milliseconds
     // Convert milliseconds to hh:mm:ss format
     const msToHMS = ( ms ) => {
@@ -54,11 +63,7 @@ const runEmail = async(vehicles) => {
         return (hours+":"+minutes+":"+seconds)
     }
 
-    // Convert date to milliseconds
-    const dateToMillis = (date) => {
-        let d = new Date(date)
-        return d.getTime()
-    }
+
 
     // Calculate duration between two times
     const calculateDuration = (items) => {
